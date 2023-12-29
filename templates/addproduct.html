@@ -1,0 +1,18 @@
+{% extends "backstage.html" %}
+
+{% block title %}
+    Add Product
+{% endblock %}
+
+{% block main %}
+    <h1>Add Product</h1>
+    <form action="/addproduct" method="post">
+        <label for="section">Type</label>
+        <select id="section" name="section">
+            <option value="" selected disabled>Type</option>
+                {% for page in buy_pages %}
+                <option value="{{ page }}">{{ page }}</option>
+                {% endfor %}
+        </select>
+    </form>
+{% endblock %}

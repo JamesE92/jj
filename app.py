@@ -10,6 +10,8 @@ app.config.from_object(Config)
 
 hashed_password = generate_password_hash(Config.PASSWORD)
 
+authenticated = False
+
 app.secret_key = secrets.token_hex(16)
 
 @app.route('/', methods=["GET", "POST"])
@@ -70,6 +72,7 @@ def contact():
 
 @app.route('/portal', methods=["GET", "POST"])
 def portal():
+    global authenticated
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -77,6 +80,8 @@ def portal():
         stored_hashed_password = hashed_password
 
         if username == Config.USERNAME and check_password_hash(stored_hashed_password, password):
+            
+            authenticated = True
             flash('Login Successful', 'success')
             return redirect(url_for('dashboard'))
         else:
@@ -84,6 +89,22 @@ def portal():
 
     return render_template("portal.html")
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=["GET", "POST"])
 def dashboard():
+    global authenticated
+    if not authenticated:
+        return redirect("/portal")
+    
     return render_template("dashboard.html")
+
+def fetch_buy_pages():
+    return ["Chain", "Bracelet", "Gold", "Creole", "Studs", "Watch", "Ring"]
+
+@app.route("/addproduct", methods=["GET", "POST"])
+def addprodcut():
+    global authenticated
+    if not authenticated:
+        return redirect("/portal")
+    
+    buy_pages = fetch_buy_pages()
+    return render_template("addproduct.html", buy_pages=buy_pages)

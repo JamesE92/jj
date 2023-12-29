@@ -84,6 +84,16 @@ body {
    padding: 4%;  
  }
 
+ .main-content a {
+   color: black;
+   font-weight: bold;
+ }
+
+ .main-content a:hover {
+   color: #9f0cb3;
+   text-decoration: underline;
+ }
+
  #login {
    display: flex;
    flex-direction: column;
