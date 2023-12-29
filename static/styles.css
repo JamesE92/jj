@@ -1,56 +1,64 @@
 body {
-    background-color: black;
-}
-
-#sidebar {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding: 2% 5%;
+    justify-content: center;
+    background-image: url("/static/background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     height: 100vh;
-    width: 6vw;
-    background-color: rgb(3, 66, 3);
-}
+    width: 100vw;
+ }
 
-.list {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0;
-    margin-bottom: 5%;
-}
+ #sidebar {
+    position: fixed;
+    left: 0;
+    background-color: #bdaf4a;
+    height: 100vh;
+    width: 10%;
+    transition: width 0.5s;
+ }
 
-#sidebar-logo {
-    max-height: 40%;
-    max-width: 100%;
-    border-radius: 50%;
-    padding: 5%;
-    margin: 5%;
-}
+ #buy {
+    color: #9f0cb3
+ }
 
-.list-head {
+ #sell {
+    color: #0cf711
+ }
+
+ #sidebar a, #sidebar h2 {
+    opacity: 0;
+    transition: opacity 0.5s;
+ }
+
+ #sidebar:hover {
+    width: 25%;
+ }
+
+ #sidebar:hover a, #sidebar:hover h2 {
+    opacity: 1;
+ }
+
+ #sidebar img {
+    width: 150px;
+ }
+
+ .main-content {
+    width: 40%;
+    background-color: #bdaf4a;
+ }
+
+ .main-content img {
+    height: 200px;
+    display: block;
+    margin: 0 0 0 120px;
+ }
+
+ .main-content p {
     text-align: center;
-    font-weight: bold;
-    margin-bottom: 5%;
-    color: rgb(161, 70, 253);
-}
+    margin: 5%
+ }
 
-.list ul {
-    border: 0;
-    list-style: none;
-    text-align: center;
-    padding: 0;
-}
-
-li a {
-    text-decoration: none;
-    color: white;
-}
-
-.list small {
-    color: white;
-}
+ #loginform {
+    display: none;
+ }
