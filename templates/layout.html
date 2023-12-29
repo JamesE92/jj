@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" type="text/css" href="../static/styles.css">
+      <link rel="icon" href="../static/logo.jpg" type="image/x-icon">
+      <title>Joker Jewellers</title>
+  </head>
+
+  <body>
+    <div id="sidebar">
+      <div class="list">
+        <img onclick="toggleSidebar()" id="sidebar-logo" src="../static/logo.jpg">
+        <span class="list-head">Buy</span>
+        <ul>
+          <li><a href="#">Chains</a></li>
+          <li><a href="#">Bracelets</a></li>
+          <li><a href="#">Gold Bars</a></li>
+          <li><a href="#">Creoles</a></li>
+          <li><a href="#">Designer Studs</a></li>
+          <li><a href="#">Watches</a></li>
+          <li><a href="#">Rings</a></li>
+        </ul>
+      </div>
+      
+      <div class="list">
+        <span class="list-head">Sell</span>
+        <ul>
+          <li><a href="#">Gold</a></li>
+          <li><a href="#">Jewellery</a></li>
+          <li><a href="#">Consign</a></li>
+        </ul>
+      </div>
+      
+      <div class="list">
+        <span class="list-head">Contact</span>
+        <ul>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div class="list">
+        <small>Legal guff goes here</small>
+      </div>
+
+    </div>
+    
+    <main>
+      {% block main %}{% endblock %}
+    </main>
+  </body>
+</html>

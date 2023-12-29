@@ -1,0 +1,56 @@
+body {
+    background-color: black;
+}
+
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 2% 5%;
+    height: 100vh;
+    width: 6vw;
+    background-color: rgb(3, 66, 3);
+}
+
+.list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    margin-bottom: 5%;
+}
+
+#sidebar-logo {
+    max-height: 40%;
+    max-width: 100%;
+    border-radius: 50%;
+    padding: 5%;
+    margin: 5%;
+}
+
+.list-head {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 5%;
+    color: rgb(161, 70, 253);
+}
+
+.list ul {
+    border: 0;
+    list-style: none;
+    text-align: center;
+    padding: 0;
+}
+
+li a {
+    text-decoration: none;
+    color: white;
+}
+
+.list small {
+    color: white;
+}
