@@ -1,7 +1,7 @@
 body {
     display: flex;
     justify-content: center;
-    background-image: url("/static/background.jpg");
+    background-image: url("/static/background.jpg");;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -10,29 +10,41 @@ body {
  }
 
  #sidebar {
+    display: flex;
+    flex-direction: column;
     position: fixed;
     left: 0;
     background-color: #bdaf4a;
     height: 100vh;
-    width: 10%;
+    width: 10vw;
     transition: width 0.5s;
  }
 
  #buy {
-    color: #9f0cb3
+    color: #9f0cb3;
  }
 
  #sell {
-    color: #0cf711
+    color: #0cf711;
+ }
+
+ #info {
+    color: white;
+ }
+
+ #sidebar a {
+    text-decoration: none;
+    font-weight: bold;
  }
 
  #sidebar a, #sidebar h2 {
+    display: block;
     opacity: 0;
     transition: opacity 0.5s;
  }
 
  #sidebar:hover {
-    width: 25%;
+    width: 25vw;
  }
 
  #sidebar:hover a, #sidebar:hover h2 {
@@ -40,23 +52,28 @@ body {
  }
 
  #sidebar img {
-    width: 150px;
+    width: 10vw;
  }
 
  .main-content {
-    width: 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40vw;
+    height: 100vh;
     background-color: #bdaf4a;
  }
 
  .main-content img {
-    height: 200px;
-    display: block;
-    margin: 0 0 0 120px;
+    width: 80%;
+    padding-left: 20%;
  }
 
  .main-content p {
     text-align: center;
-    margin: 5%
+    font-weight: bold;
+    padding: 4%;  
  }
 
  #loginform {
