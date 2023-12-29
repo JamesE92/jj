@@ -1,9 +1,14 @@
 import os
 import secrets
 
-from flask import Flask, flash, render_template, redirect, request, session
+from flask import Flask, flash, render_template, redirect, request, session, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
+from config import Config
 
 app = Flask(__name__)
+app.config.from_object(Config)
+
+hashed_password = generate_password_hash(Config.PASSWORD)
 
 app.secret_key = secrets.token_hex(16)
 
@@ -64,5 +69,21 @@ def contact():
     return render_template("contact.html")
 
 @app.route('/portal', methods=["GET", "POST"])
-def backstage():
+def portal():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        stored_hashed_password = hashed_password
+
+        if username == Config.USERNAME and check_password_hash(stored_hashed_password, password):
+            flash('Login Successful', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid username or password', 'error')
+
     return render_template("portal.html")
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template("dashboard.html")

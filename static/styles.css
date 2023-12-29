@@ -84,6 +84,44 @@ body {
    padding: 4%;  
  }
 
- #loginform {
-    display: none;
+ #login {
+   display: flex;
+   flex-direction: column;
+   text-align: center;
+   padding: 5vw;
+   margin: 2vh;
+ }
+
+ #user label {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+
+ #user input {
+   border: 2px solid lime;
+   background-color: black;
+   color: white;
+   border-radius: 25% 0 25% 0;
+   margin-bottom: 5vh;
+ }
+
+ #pass label {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+
+ #pass input {
+   border: 2px solid purple;
+   background-color: black;
+   color: white;
+   border-radius: 0 25% 0 25%;
+   margin-bottom: 7vh;
+ }
+
+ #login button {
+   background-color: black;
+   font-weight: bold;
+   color: white;
+   border: 2px solid grey;
+   border-radius: 50%;
  }
