@@ -6,13 +6,34 @@
 
 {% block main %}
     <h1>Add Product</h1>
-    <form action="/addproduct" method="post">
+    <form id="upload" action="/addproduct" method="post" enctype="multipart/form-data">
+        
         <label for="section">Type</label>
-        <select id="section" name="section">
-            <option value="" selected disabled>Type</option>
-                {% for page in buy_pages %}
-                <option value="{{ page }}">{{ page }}</option>
-                {% endfor %}
-        </select>
+            <select id="section" name="section">
+                <option value="" selected disabled>Type</option>
+                    {% for page in buy_pages %}
+                    <option value="{{ page }}">{{ page }}</option>
+                    {% endfor %}
+            </select>
+
+        <label for="item">Item name</label>
+            <input type="text" id="item" name="item">
+
+        <label for="image">Image</label>
+            <input type="file" id="image" name="image" accept="image/jpeg">
+        
+        <label for="brand">Brand</label>
+            <input type="text" id="brand" name="brand">
+
+        <label for="weight">Weight</label>
+            <input type="number" id="weight" name="weight">
+            
+        <label for="price">Price</label>
+            <input type="number" id="price" name="price">
+
+        <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" cols="50"></textarea>
+        
+        <input type="submit" value="submit">
     </form>
 {% endblock %}

@@ -1,0 +1,4 @@
+{
+    "UPLOAD_FOLDER": "/static/productimages",
+    "THUMBNAIL_FOLDER": "/static/thumbnails"
+}

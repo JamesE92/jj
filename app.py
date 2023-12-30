@@ -1,11 +1,22 @@
+import json
 import os
 import secrets
 
-from flask import Flask, flash, render_template, redirect, request, session, url_for
-from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
+from flask import Flask, flash, render_template, redirect, request, session, url_for
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed, FileRequired
+from PIL import Image
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+with open('config.json', 'r') as config_file:
+    config = json.load(config_file)
+
+app.config.update(config)
+
 app.config.from_object(Config)
 
 hashed_password = generate_password_hash(Config.PASSWORD)
@@ -13,6 +24,18 @@ hashed_password = generate_password_hash(Config.PASSWORD)
 authenticated = False
 
 app.secret_key = secrets.token_hex(16)
+
+upload_folder = app.config['UPLOAD_FOLDER']
+thumbnail_folder = app.config['THUMBNAIL_FOLDER']
+    
+def create_directories():
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder)
+    
+    if not os.path.exists(thumbnail_folder):
+        os.makedirs(thumbnail_folder)
+
+create_directories()
 
 @app.route('/', methods=["GET", "POST"])
 def homepage():
@@ -24,31 +47,38 @@ def raffles():
 
 @app.route("/chains", methods=["GET", "POST"])
 def chains():
-    return render_template("chains.html")
+    chain_products = [product for product in products if product['section'] == 'Chain']
+    return render_template("chains.html", chain_products=chain_products)
 
 @app.route("/bracelets", methods=["GET", "POST"])
 def bracelets():
-    return render_template("bracelets.html")
+    bracelet_products = [product for product in products if product['section'] == 'Bracelet']
+    return render_template("bracelets.html", bracelet_products=bracelet_products)
 
 @app.route("/bars", methods=["GET", "POST"])
 def bars():
-    return render_template("bars.html")
+    bar_products = [product for product in products if product['section'] == 'Gold']
+    return render_template("bars.html", bar_products=bar_products)
 
 @app.route("/creole", methods=["GET", "POST"])
 def creole():
-    return render_template("creole.html")
+    creole_products = [product for product in products if product['section'] == 'Creole']
+    return render_template("creole.html", creole_products=creole_products)
 
 @app.route("/studs", methods=["GET", "POST"])
 def studs():
-    return render_template("studs.html")
+    stud_products = [product for product in products if product['section'] == 'Studs']
+    return render_template("studs.html", stud_products=stud_products)
 
 @app.route("/watches", methods=["GET", "POST"])
 def watches():
-    return render_template("watches.html")
+    watch_products = [product for product in products if product['section'] == 'Watch']
+    return render_template("watches.html", watch_products=watch_products)
 
 @app.route("/rings", methods=["GET", "POST"])
 def rings():
-    return render_template("rings.html")
+    ring_products = [product for product in products if product['section'] == 'Ring']
+    return render_template("rings.html", ring_products=ring_products)
 
 @app.route("/sellgold", methods=["GET", "POST"])
 def sellgold():
@@ -100,11 +130,53 @@ def dashboard():
 def fetch_buy_pages():
     return ["Chain", "Bracelet", "Gold", "Creole", "Studs", "Watch", "Ring"]
 
+def generate_thumbnail(image_path):
+    uploaded_image = Image.open(image_path)
+    uploaded_image.thumbnail((150, 150))
+    return uploaded_image
+
+products = []
+
 @app.route("/addproduct", methods=["GET", "POST"])
-def addprodcut():
+def addproduct():
     global authenticated
     if not authenticated:
-        return redirect("/portal")
+        return redirect("/portal")    
     
     buy_pages = fetch_buy_pages()
+
+    if request.method == "POST":
+        section = request.form.get("section")
+        name = request.form.get("item")
+        brand = request.form.get("brand")
+        weight = request.form.get("weight")
+        price = request.form.get("price")
+        description = request.form.get("description")
+
+        placeholder = '/static/logo.png'
+        uploaded_image = request.files.get('image')
+        image_filename = secure_filename(uploaded_image.filename) if uploaded_image else placeholder
+
+        if uploaded_image:
+            image_path = os.path.join(upload_folder, image_filename)
+            uploaded_image.save(image_path)
+        else:
+            image_path = os.path.join(upload_folder, placeholder)
+
+        thumbnail = generate_thumbnail(image_path)
+        thumbnail.save(os.path.join(thumbnail_folder, f'thumbnail_{image_filename}'))
+
+
+        product_data = {
+            "section": section,
+            "name":name,
+            "brand": brand,
+            "weight": weight,
+            "price": price,
+            "description": description,
+            "image_filename": image_filename,
+            "thumbnail_filename": f'thumbnail_{image_filename}'
+        }
+        products.append(product_data)
+
     return render_template("addproduct.html", buy_pages=buy_pages)
