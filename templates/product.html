@@ -8,7 +8,9 @@
     <div id="display">
         <img src="{{ url_for('static', filename='productimages/' + product.image_filename) }}" alt="Product Image">
         
-        <h2>{{ product.name }}</h2>
+        <h3>{{ product.status }}</h3>
+
+        <h3>{{ product.name }}</h3>
         
         {% if product.brand %}
         <h3>Brand: {{ product.brand }}</h3>
@@ -24,6 +26,7 @@
         <p>{{ product.description }}</p>
         {% endif %}
 
+        {% if product.status == 'Available' %}
         <h3>Enquire</h3>
         <form action="{{ url_for('product', product_id=product.id) }}", method="POST">
             <label for="name">Name:</label>
@@ -36,6 +39,7 @@
             <textarea id="enquire" name="enquire" rows="4" cols="50" required>{{ product.name }} - </textarea>
             <br>
             <input type="submit" value="submit">
-        </form> 
+        </form>
+        {% endif %} 
     </div>
 {% endblock %}

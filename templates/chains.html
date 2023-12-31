@@ -13,7 +13,7 @@
             <a href="{{ url_for('product', product_id=product.id) }}">
                 <h3>{{ product.name }}</h3>
                 <img src="{{ url_for('static', filename='thumbnails/' + product.thumbnail_filename) }}" alt="Product Thumbnail">
-                <p>{{ product.price }}</p>
+                <p>{{ product.status }} - {{ product.price }}</p>
             </a>
         </div>
         {% endfor %}

@@ -184,7 +184,8 @@ def addproduct():
             "price": price,
             "description": description,
             "image_filename": image_filename,
-            "thumbnail_filename": f'thumbnail_{image_filename}'
+            "thumbnail_filename": f'thumbnail_{image_filename}',
+            "status": "Available"
         }
         products.append(product_data)
 
