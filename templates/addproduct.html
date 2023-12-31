@@ -10,16 +10,16 @@
         
         <label for="section">Type</label>
             <select id="section" name="section">
-                <option value="" selected disabled>Type</option>
+                <option value="" selected disabled>Type*</option>
                     {% for page in buy_pages %}
                     <option value="{{ page }}">{{ page }}</option>
                     {% endfor %}
             </select>
 
-        <label for="item">Item name</label>
+        <label for="item">Item name*</label>
             <input type="text" id="item" name="item">
 
-        <label for="image">Image</label>
+        <label for="image">Image*</label>
             <input type="file" id="image" name="image" accept="image/jpeg">
         
         <label for="brand">Brand</label>
@@ -28,7 +28,7 @@
         <label for="weight">Weight</label>
             <input type="number" id="weight" name="weight">
             
-        <label for="price">Price</label>
+        <label for="price">Price*</label>
             <input type="number" id="price" name="price">
 
         <label for="description">Description</label>

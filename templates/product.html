@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ product.name }}
+{% endblock %}
+
+{% block main %}
+    <div id="display">
+        <img src="{{ url_for('static', filename='productimages/' + product.image_filename) }}" alt="Product Image">
+        
+        <h2>{{ product.name }}</h2>
+        
+        {% if product.brand %}
+        <h3>Brand: {{ product.brand }}</h3>
+        {% endif %}
+
+        {% if product.weight %}
+        <h3>Weight: {{ product.weight }}g</h3>
+        {% endif %}
+
+        <h3>£{{ product.price }}</h3>
+
+        {% if product.description %}
+        <p>{{ product.description }}</p>
+        {% endif %}
+
+        <h3>Enquire</h3>
+        <form action="{{ url_for('product', product_id=product.id) }}", method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <br>
+            <label for="enquire">Message:</label>
+            <textarea id="enquire" name="enquire" rows="4" cols="50" required>{{ product.name }} - </textarea>
+            <br>
+            <input type="submit" value="submit">
+        </form> 
+    </div>
+{% endblock %}

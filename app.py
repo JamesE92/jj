@@ -80,6 +80,11 @@ def rings():
     ring_products = [product for product in products if product['section'] == 'Ring']
     return render_template("rings.html", ring_products=ring_products)
 
+@app.route("/product/<int:product_id>", methods=["GET", "POST"])
+def product(product_id):
+    product = products[product_id - 1]
+    return render_template("product.html", product=product)
+
 @app.route("/sellgold", methods=["GET", "POST"])
 def sellgold():
     return render_template("sellgold.html")
@@ -136,9 +141,11 @@ def generate_thumbnail(image_path):
     return uploaded_image
 
 products = []
+product_id = 0
 
 @app.route("/addproduct", methods=["GET", "POST"])
 def addproduct():
+    global product_id
     global authenticated
     if not authenticated:
         return redirect("/portal")    
@@ -166,8 +173,10 @@ def addproduct():
         thumbnail = generate_thumbnail(image_path)
         thumbnail.save(os.path.join(thumbnail_folder, f'thumbnail_{image_filename}'))
 
+        product_id += 1
 
         product_data = {
+            "id": product_id,
             "section": section,
             "name":name,
             "brand": brand,
