@@ -189,3 +189,21 @@ def addproduct():
         products.append(product_data)
 
     return render_template("addproduct.html", buy_pages=buy_pages)
+
+@approute('/viewstock', methods=["GET", "POST"])
+def viewstock():
+    if request.method == "POST":
+        product_id = int(request.form.get('product_id'))
+        action = request.form.get('action')
+
+        if action == 'reserved':
+            product = next((p for p in products if p['id'] == product_id), None)
+            if product:
+                product['status'] = 'Reserved'
+
+        elif action == 'sold':
+            product = next((p for p in products if p['id'] == product_id), None)
+            if product:
+                products.remove(product)
+
+    return render_template('viewstock.html', products=products)

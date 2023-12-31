@@ -1,0 +1,21 @@
+{% extends "backstage.html"}
+
+{% block title %}
+    Stock Management
+{% endblock %}
+
+{% block main %}
+<h1>Stock</h1>
+    <form action="{{ url_for('viewstock')}}" method="POST">
+        <ul>
+            {% for product in products %}
+                <li>
+                    {{ product.name }} - {{ product.status }}
+                    <input type="hidden" name="product_id" value="{{ product.id}}">
+                    <input type="submit" name="action" value="reserved">
+                    <input type="submit" name="action" value="sold">
+                </li>
+            {% endfor %}
+        </ul>
+    </form>
+{% endblock %}
