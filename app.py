@@ -190,7 +190,7 @@ def addproduct():
 
     return render_template("addproduct.html", buy_pages=buy_pages)
 
-@approute('/viewstock', methods=["GET", "POST"])
+@app.route('/viewstock', methods=["GET", "POST"])
 def viewstock():
     if request.method == "POST":
         product_id = int(request.form.get('product_id'))
