@@ -37,13 +37,20 @@ def create_directories():
 
 create_directories()
 
+products = []
+product_id = 0
+
+raffle = []
+raffle_id = 0
+
 @app.route('/', methods=["GET", "POST"])
 def homepage():
     return render_template("index.html")
 
 @app.route("/raffles", methods=["GET", "POST"])
-def raffles():
-    return render_template("raffles.html")
+def display_raffles():
+    raffle_items = raffle
+    return render_template("raffles.html", raffles=raffle_items)
 
 @app.route("/chains", methods=["GET", "POST"])
 def chains():
@@ -140,9 +147,6 @@ def generate_thumbnail(image_path):
     uploaded_image.thumbnail((150, 150))
     return uploaded_image
 
-products = []
-product_id = 0
-
 @app.route("/addproduct", methods=["GET", "POST"])
 def addproduct():
     global product_id
@@ -193,6 +197,10 @@ def addproduct():
 
 @app.route('/viewstock', methods=["GET", "POST"])
 def viewstock():
+    global authenticated
+    if not authenticated:
+        return redirect("/portal")
+    
     if request.method == "POST":
         product_id = int(request.form.get('product_id'))
         action = request.form.get('action')
@@ -208,3 +216,60 @@ def viewstock():
                 break
 
     return render_template('viewstock.html', products=products)
+
+@app.route('/startraffle', methods=["GET", "POST"])
+def startraffle():
+    global authenticated
+    if not authenticated:
+        return redirect("/portal")
+
+    global raffle_id
+    if request.method == "POST":
+        item = request.form.get("item")
+        brand = request.form.get("brand")
+        weight = request.form.get("weight")
+        ticket = request.form.get("ticket")
+        description = request.form.get("description")
+        question = request.form.get("trivia")
+        a1 = request.form.get("answer1")
+        a2 = request.form.get("answer2")
+        a3 = request.form.get("answer3")
+
+        placeholder = "static/logo.png"
+        picture = request.files.get("image")
+        pic_name = secure_filename(picture.filename) if picture else placeholder
+
+        if picture:
+            pic_path = os.path.join(upload_folder, pic_name)
+            picture.save(pic_path)
+        else:
+            pic_path = os.path.join(upload_folder, placeholder)
+
+        thumbnail = generate_thumbnail(pic_path)
+        thumbnail.save(os.path.join(thumbnail_folder, f'thumbnail_{pic_name}'))
+         
+        raffle_id += 1
+
+        raffle_data = {
+            "id": raffle_id,
+            "item": item,
+            "brand": brand,
+            "weight": weight,
+            "price": ticket,
+            "description": description,
+            "pic_name": pic_name,
+            "thumbnail_filename": f'thumbnail_{pic_name}',
+            "question": question,
+            "answer1": a1,
+            "answer2": a2,
+            "answer3": a3,
+            "status": "Slots Available"
+        }
+
+        raffle.append(raffle_data)
+
+    return render_template('startraffle.html')
+
+@app.route('/endraffle', methods=["GET", "POST"])
+def endraffle():
+    return render_template('endraffle.html')

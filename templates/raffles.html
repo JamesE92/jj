@@ -7,7 +7,15 @@
 {% block main %}
 <img src="/static/logo2.png">
 <h1>Jokers Raffles</h1>
-<p>This page will be populated by raffles
-   uploaded via admin server.
-</p>
+<div class="raffle-grid">
+    {% for raffle in raffles %}
+        <div class="raffle-item">
+            <a href="{{ url_for('raffle', raffle_id=raffle.id) }}">
+                <h3>{{ raffle.item }}</h3>
+                <img src="{{ url_for('static', filename='thumbnails/' + raffle.thumbnail_filename) }}" alt="Raffle thumbnail">
+                <p>{{ raffle.status }} - {{ raffle.ticket }}</p>
+            </a>
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}
