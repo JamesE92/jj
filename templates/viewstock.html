@@ -6,16 +6,20 @@
 
 {% block main %}
 <h1>Stock</h1>
-    <form action="{{ url_for('viewstock')}}" method="POST">
-        <ul>
-            {% for product in products %}
-                <li>
-                    {{ product.name }} - {{ product.status }}
-                    <input type="hidden" name="product_id" value="{{ product.id}}">
+    <ul>
+        {% for product in products %}
+            <li>
+                {{ product.name }} - {{ product.status }}
+                <form action="{{ url_for('viewstock')}}" method="POST">
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    {% if product.status == 'Available' %}
                     <input type="submit" name="action" value="reserved">
+                    {% elif product.status == 'Reserved' %}
+                    <input type="submit" name="action" value="available">
+                    {% endif %}
                     <input type="submit" name="action" value="sold">
-                </li>
-            {% endfor %}
-        </ul>
-    </form>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}

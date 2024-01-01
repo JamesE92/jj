@@ -197,14 +197,14 @@ def viewstock():
         product_id = int(request.form.get('product_id'))
         action = request.form.get('action')
 
-        if action == 'reserved':
-            product = next((p for p in products if p['id'] == product_id), None)
-            if product:
-                product['status'] = 'Reserved'
-
-        elif action == 'sold':
-            product = next((p for p in products if p['id'] == product_id), None)
-            if product:
-                products.remove(product)
+        for product in products:
+            if product['id'] == product_id:
+                if action == 'reserved':
+                    product['status'] = 'Reserved'
+                elif action == 'available':
+                    product['status'] = 'Available'
+                elif action == 'sold':
+                    products.remove(product)
+                break
 
     return render_template('viewstock.html', products=products)
