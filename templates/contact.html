@@ -7,5 +7,16 @@
 {% block main %}
 <img src="/static/logo2.png">
 <h1>Contact Joker</h1>
-<p>Form for contact in here</p>
+<form action="/contact", method="POST">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+    <br>
+    <label for="enquire">Message:</label>
+    <textarea id="enquire" name="enquire" rows="4" cols="50" required>  </textarea>
+    <br>
+    <input type="submit" value="submit">
+</form>
 {% endblock %}

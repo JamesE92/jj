@@ -8,7 +8,17 @@
 <img src="/static/logo2.png">
 <h1>Joker - sell my item!</h1>
 <p>Information on consignment here</p>
-<p>This page will contain a contact form
-    for consignment.
-</p>
+<h3>Enquire</h3>
+<form action="/consign" method="POST">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+    <br>
+    <label for="enquire">Message:</label>
+    <textarea id="enquire" name="enquire" rows="4" cols="50" required> Consignment - </textarea>
+    <br>
+    <input type="submit" value="submit">
+</form>
 {% endblock %}

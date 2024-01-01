@@ -7,8 +7,17 @@
 {% block main %}
 <img src="/static/logo2.png">
 <h1>Sell Joker My Gold</h1>
-<p>This page will contain a contact form
-    (maybe later a tool to estimate price)
-    for sales of gold.
-</p>
+<h3>Enquire</h3>
+<form action="/sellgold" method="POST">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+    <br>
+    <label for="enquire">Message:</label>
+    <textarea id="enquire" name="enquire" rows="4" cols="50" required>Gold - </textarea>
+    <br>
+    <input type="submit" value="submit">
+</form>
 {% endblock %}
