@@ -52,6 +52,12 @@ def display_raffles():
     raffle_items = raffle
     return render_template("raffles.html", raffles=raffle_items)
 
+@app.route('/rafflepage/<int:raffle_id>', methods=["GET", "POST"])
+def rafflepage(raffle_id):
+    page = raffle[raffle_id - 1]
+    return render_template('display_raffles.html', page=page, raffle=raffle)
+
+
 @app.route("/chains", methods=["GET", "POST"])
 def chains():
     chain_products = [product for product in products if product['section'] == 'Chain']
@@ -246,8 +252,9 @@ def startraffle():
             pic_path = os.path.join(upload_folder, placeholder)
 
         thumbnail = generate_thumbnail(pic_path)
-        thumbnail.save(os.path.join(thumbnail_folder, f'thumbnail_{pic_name}'))
-         
+        thumbnail_filename = f'thumbnail_{pic_name}'
+        thumbnail.save(os.path.join(thumbnail_folder, thumbnail_filename))
+
         raffle_id += 1
 
         raffle_data = {
@@ -258,14 +265,13 @@ def startraffle():
             "price": ticket,
             "description": description,
             "pic_name": pic_name,
-            "thumbnail_filename": f'thumbnail_{pic_name}',
+            "thumbnail_filename": thumbnail_filename,
             "question": question,
             "answer1": a1,
             "answer2": a2,
             "answer3": a3,
             "status": "Slots Available"
         }
-
         raffle.append(raffle_data)
 
     return render_template('startraffle.html')
