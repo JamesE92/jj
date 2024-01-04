@@ -36,6 +36,7 @@
 
         <h3>Enter Raffle</h3>
         <form action="{{ url_for('display_raffles', raffle_id=raffle.id) }}" method="POST">
+            <input type="hidden" id="selectedAnswer" name="selectedAnswer" value="">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
             <br>
@@ -53,4 +54,11 @@
         <h3>Unfortunately, this raffle has sold out.</h3>
         {% endif %}
     </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            rafflesubject();
+        });
+    </script>
     {% endblock %}

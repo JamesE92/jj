@@ -7,6 +7,8 @@
 {% block main %}
     <h1>Add Raffle</h1>
 
+    <a href="/dashboard">Back to Dashboard</a>
+
     <form id="addraffle" action="/startraffle" method="post" enctype="multipart/form-data">
         <label for="item">Item name*</label>
             <input type="text" id="item" name="item" required>
