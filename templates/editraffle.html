@@ -1,0 +1,30 @@
+{% extends "backstage.html" %}
+
+{% block title %}
+    Raffle Management
+{% endblock %}
+
+{% block main %}
+    <h1>Raffles</h1>
+    <ul>
+        {% for raffle in raffles %}
+            <li>
+                {{ raffle.item }} - {{ raffle.status }}
+                    <form action="{{ url_for('editraffle')}}" method="POST">
+                        <input type="hidden" name="raffle_id" value="{{ raffle.id}}">
+                {% if raffle.status == "Slots Available" %}
+                    <input type="submit" name="action" value="Limited Slots">
+                    <input type="submit" name="action" value="Full">
+                {% elif raffle.status == "Limited Slots" %}
+                    <input type="submit" name="action" value="Slots Available">
+                    <input type="submit" name="action" value="Full">
+                {% elif raffle.status == "Full" %}
+                    <input type="submit" name="action" value="Slots Available">
+                    <input type="submit" name="action" value="Limited Slots">
+                {% endif %}
+                    <input type="submit" name="action" value="Finish">
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

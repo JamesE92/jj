@@ -52,9 +52,10 @@ def display_raffles():
     raffle_items = raffle
     return render_template("raffles.html", raffles=raffle_items)
 
-@app.route('/rafflepage/<int:raffle_id>', methods=["GET", "POST"])
+@app.route('/display_raffles/<int:raffle_id>', methods=["GET", "POST"])
 def rafflepage(raffle_id):
-    page = raffle[raffle_id - 1]
+    page = next((item for item in raffle if item['id'] == raffle_id), None)
+
     return render_template('display_raffles.html', page=page, raffle=raffle)
 
 
@@ -225,6 +226,7 @@ def viewstock():
 
 @app.route('/startraffle', methods=["GET", "POST"])
 def startraffle():
+
     global authenticated
     if not authenticated:
         return redirect("/portal")
@@ -262,7 +264,7 @@ def startraffle():
             "item": item,
             "brand": brand,
             "weight": weight,
-            "price": ticket,
+            "ticket": ticket,
             "description": description,
             "pic_name": pic_name,
             "thumbnail_filename": thumbnail_filename,
@@ -273,9 +275,28 @@ def startraffle():
             "status": "Slots Available"
         }
         raffle.append(raffle_data)
-
+        print(raffle)
     return render_template('startraffle.html')
 
-@app.route('/endraffle', methods=["GET", "POST"])
-def endraffle():
-    return render_template('endraffle.html')
+@app.route('/editraffle', methods=["GET", "POST"])
+def editraffle():
+    global authenticated
+    if not authenticated:
+        return redirect('/portal')
+    
+    if request.method == "POST":
+        raffle_id = int(request.form.get('raffle_id'))
+        action = request.form.get('action')
+
+        for raffle_item in raffle:
+            if raffle_item['id'] == raffle_id:
+                if action == 'Limited Slots':
+                    raffle_item['status'] = 'Limited Slots'
+                elif action == 'Full':
+                    raffle_item['status'] = 'Full'
+                elif action == 'Slots Available':
+                    raffle_item['status'] = 'Slots Available'
+                elif action == 'Finish':
+                    raffle.remove(raffle_item)
+                break
+    return render_template('editraffle.html', raffles=raffle)

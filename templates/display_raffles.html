@@ -6,32 +6,32 @@
 
 {% block main %}
     <div id="display">
-        <img src="{{ url_for('static', filename='productimages/' + item.pic_name) }}">
-        <h3>{{ raffle.status }}</h3>
+        <img src="{{ url_for('static', filename='productimages/' + page.pic_name) }}">
+        <h3>{{ page.status }}</h3>
 
-        <h3>{{ raffle.item }}</h3>
+        <h3>{{ page.item }}</h3>
 
-        {% if raffle.brand %}
-        <h3>Brand: {{ raffle.brand }}</h3>
+        {% if page.brand %}
+        <h3>Brand: {{ page.brand }}</h3>
         {% endif %}
 
-        {% if raffle.weight %}
-        <h3>Weight: {{ raffle.weight }}</h3>
+        {% if page.weight %}
+        <h3>Weight: {{ page.weight }}</h3>
         {% endif %}
 
-        <h3>£{{ raffle.ticket }}</h3>
+        <h3>£{{ page.ticket }}</h3>
 
-        {% if raffle.description %}
-        <h3>{{ raffle.description }}</h3>
+        {% if page.description %}
+        <h3>{{ page.description }}</h3>
         {% endif %}
 
-        {% if raffle.status != 'Full' %}
-        <h3>{{ raffle.trivia }}</h3>
+        {% if page.status != 'Full' %}
+        <h3>{{ page.trivia }}</h3>
 
         <select name="answers" id="answers">
-            <option value="answer1">{{ raffle.answer1 }}</option>
-            <option value="answer2">{{ raffle.answer2 }}</option>
-            <option value="answer3">{{ raffle.answer3 }}</option>
+            <option value="answer1">{{ page.answer1 }}</option>
+            <option value="answer2">{{ page.answer2 }}</option>
+            <option value="answer3">{{ page.answer3 }}</option>
         </select>
 
         <h3>Enter Raffle</h3>
@@ -49,7 +49,7 @@
         </form>
         {% endif %}
 
-        {% if raffle.status == 'Full' %}
+        {% if page.status == 'Full' %}
         <h3>Unfortunately, this raffle has sold out.</h3>
         {% endif %}
     </div>
