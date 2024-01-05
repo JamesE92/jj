@@ -10,37 +10,29 @@
     <a href="/dashboard">Back to Dashboard</a>
 
     <form id="addraffle" action="/startraffle" method="post" enctype="multipart/form-data">
-        <label for="item">Item name*</label>
-            <input type="text" id="item" name="item" required>
+        
+        <input type="text" id="item" name="item" placeholder="Item Name*" required>
 
         <label for="image">Image*</label>
             <input type="file" id="image" name="image" accept="image/jpeg" required>
 
-        <label for="brand">Brand</label>
-            <input type="text" id="brand" name="brand">
+        <input type="text" id="brand" name="brand" placeholder="Brand">
 
-        <label for="weight">Weight</label>
-            <input type="number" id="weight" name="weight">
+        <input type="number" id="weight" name="weight" placeholder="Weight">
             
-        <label for="ticket">Ticket Price*</label>
-            <input type="number" id="ticket" name="ticket" required>
+        <input type="number" id="ticket" name="ticket" placeholder="Ticket Price*" required>
 
-        <label for="description">Description</label>
-            <textarea id="description" name="description" rows="4" cols="50"></textarea>
+        <textarea id="description" name="description" rows="4" cols="50">Describe Item</textarea>
 
-        <label for="trivia">Entry Question*</label>
-            <input type="text" id="trivia" name="trivia" required></textarea>
+        <input type="text" id="trivia" name="trivia" placeholder="Entry Question*" required>
 
-            <p>Please write 1 correct answer, and 2 incorrect answers.</p>
+        <p>Please write 1 correct answer, and 2 incorrect answers.</p>
 
-        <label for="answer1">Answer 1*</label>
-            <input type="text" id="answer1" name="answer1" required>
+        <input type="text" id="answer1" name="answer1" placeholder="Answer" required>
             
-        <label for="answer2">Answer 2*</label>
-            <input type="text" id="answer2" name="answer2" required>
+        <input type="text" id="answer2" name="answer2" placeholder="Answer" required>
             
-        <label for="answer3">Answer 3*</label>
-            <input type="text" id="answer3" name="answer3" required>
+        <input type="text" id="answer3" name="answer3" placeholder="Answer" required>
 
         <input type="submit" value="submit">
     </form>

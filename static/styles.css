@@ -37,6 +37,33 @@ body {
     font-weight: bold;
  }
 
+#purchaseslots a {
+  color: black;
+}
+
+#saleslots a {
+  color: black;
+}
+
+#infoslots a {
+  color: black;
+}
+
+ #purchaseslots a:hover {
+  color: #9F0CB3;
+  text-decoration: underline;
+ }
+
+ #saleslots a:hover {
+  color:#0cf711;
+  text-decoration: underline;
+ }
+
+ #infoslots a:hover {
+  color: white;
+  text-decoration: underline;
+ }
+
  #sidebar a, #sidebar h2 {
     display: block;
     opacity: 0;
@@ -174,3 +201,17 @@ body {
   max-width: 70%;
   justify-content: center;
 }
+
+#addraffle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-height: 100vh;
+  max-width: 70vw;
+}
+
+#addraffle p {
+  padding: 0;
+}
+
