@@ -14,16 +14,16 @@
                     <form action="{{ url_for('editraffle')}}" method="POST">
                         <input type="hidden" name="raffle_id" value="{{ raffle.id}}">
                 {% if raffle.status == "Slots Available" %}
-                    <input type="submit" name="action" value="Limited Slots">
-                    <input type="submit" name="action" value="Full">
+                    <input type="submit" class="limit" name="action" value="Limited Slots">
+                    <input type="submit" class="limit" name="action" value="Full">
                 {% elif raffle.status == "Limited Slots" %}
-                    <input type="submit" name="action" value="Slots Available">
-                    <input type="submit" name="action" value="Full">
+                    <input type="submit" class="free" name="action" value="Slots Available">
+                    <input type="submit" class="limit" name="action" value="Full">
                 {% elif raffle.status == "Full" %}
-                    <input type="submit" name="action" value="Slots Available">
-                    <input type="submit" name="action" value="Limited Slots">
+                    <input type="submit" class="free" name="action" value="Slots Available">
+                    <input type="submit" class="limit" name="action" value="Limited Slots">
                 {% endif %}
-                    <input type="submit" name="action" value="Finish">
+                    <input type="submit" class="finish" name="action" value="Finish">
                 </form>
             </li>
         {% endfor %}

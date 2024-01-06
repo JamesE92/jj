@@ -275,7 +275,7 @@ def startraffle():
             "status": "Slots Available"
         }
         raffle.append(raffle_data)
-        print(raffle)
+
     return render_template('startraffle.html')
 
 @app.route('/editraffle', methods=["GET", "POST"])
@@ -300,3 +300,6 @@ def editraffle():
                     raffle.remove(raffle_item)
                 break
     return render_template('editraffle.html', raffles=raffle)
+
+if __name__ == '__main__':
+    app.run(debug=False)

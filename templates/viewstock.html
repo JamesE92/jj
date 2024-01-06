@@ -10,15 +10,15 @@
     <ul>
         {% for product in products %}
             <li>
-                {{ product.name }} - {{ product.status }}
+                {{ product.name }} - {{ product.status }} - {{ product.section }}
                 <form action="{{ url_for('viewstock')}}" method="POST">
                     <input type="hidden" name="product_id" value="{{ product.id }}">
                     {% if product.status == 'Available' %}
-                    <input type="submit" name="action" value="reserved">
+                    <input type="submit" class="limit" name="action" value="reserved">
                     {% elif product.status == 'Reserved' %}
-                    <input type="submit" name="action" value="available">
+                    <input type="submit" class="free" name="action" value="available">
                     {% endif %}
-                    <input type="submit" name="action" value="sold">
+                    <input type="submit" class="finish" name="action" value="sold">
                 </form>
             </li>
         {% endfor %}

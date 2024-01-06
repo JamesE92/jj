@@ -215,3 +215,16 @@ body {
   padding: 0;
 }
 
+.free {
+  background-color: lime;
+  font-weight: bold;
+}
+.limit {
+  background-color: yellow;
+  font-weight: bold;
+}
+
+.finish {
+  background-color: red;
+  font-weight: bold;
+}
