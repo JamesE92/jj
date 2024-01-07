@@ -2,7 +2,7 @@ import json
 import os
 import secrets
 
-from config import Config
+from config import Config, get_db, close_db, fetch_buy_pages, generate_thumbnail, add_product, get_all_products, get_products_by_section, get_product_by_id, update_product_status, delete_product, close_connection
 from flask import Flask, flash, render_template, redirect, request, session, url_for
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
@@ -61,42 +61,42 @@ def rafflepage(raffle_id):
 
 @app.route("/chains", methods=["GET", "POST"])
 def chains():
-    chain_products = [product for product in products if product['section'] == 'Chain']
+    chain_products = get_products_by_section('Chain')
     return render_template("chains.html", chain_products=chain_products)
 
 @app.route("/bracelets", methods=["GET", "POST"])
 def bracelets():
-    bracelet_products = [product for product in products if product['section'] == 'Bracelet']
+    bracelet_products = get_products_by_section('Bracelet')
     return render_template("bracelets.html", bracelet_products=bracelet_products)
 
 @app.route("/bars", methods=["GET", "POST"])
 def bars():
-    bar_products = [product for product in products if product['section'] == 'Gold']
+    bar_products = get_products_by_section('Gold')
     return render_template("bars.html", bar_products=bar_products)
 
 @app.route("/creole", methods=["GET", "POST"])
 def creole():
-    creole_products = [product for product in products if product['section'] == 'Creole']
+    creole_products = get_products_by_section('Creole')
     return render_template("creole.html", creole_products=creole_products)
 
 @app.route("/studs", methods=["GET", "POST"])
 def studs():
-    stud_products = [product for product in products if product['section'] == 'Studs']
+    stud_products = get_products_by_section('Studs')
     return render_template("studs.html", stud_products=stud_products)
 
 @app.route("/watches", methods=["GET", "POST"])
 def watches():
-    watch_products = [product for product in products if product['section'] == 'Watch']
+    watch_products = get_products_by_section('Watch')
     return render_template("watches.html", watch_products=watch_products)
 
 @app.route("/rings", methods=["GET", "POST"])
 def rings():
-    ring_products = [product for product in products if product['section'] == 'Ring']
+    ring_products = get_products_by_section('Ring')
     return render_template("rings.html", ring_products=ring_products)
 
 @app.route("/product/<int:product_id>", methods=["GET", "POST"])
 def product(product_id):
-    product = products[product_id - 1]
+    product = get_product_by_id(product_id)
     return render_template("product.html", product=product)
 
 @app.route("/sellgold", methods=["GET", "POST"])
@@ -146,14 +146,6 @@ def dashboard():
     
     return render_template("dashboard.html")
 
-def fetch_buy_pages():
-    return ["Chain", "Bracelet", "Gold", "Creole", "Studs", "Watch", "Ring"]
-
-def generate_thumbnail(image_path):
-    uploaded_image = Image.open(image_path)
-    uploaded_image.thumbnail((150, 150))
-    return uploaded_image
-
 @app.route("/addproduct", methods=["GET", "POST"])
 def addproduct():
     global product_id
@@ -167,8 +159,8 @@ def addproduct():
         section = request.form.get("section")
         name = request.form.get("item")
         brand = request.form.get("brand")
-        weight = request.form.get("weight")
-        price = request.form.get("price")
+        weight = float(request.form.get("weight"))
+        price = float(request.form.get("price"))
         description = request.form.get("description")
 
         placeholder = '/static/logo.png'
@@ -178,27 +170,13 @@ def addproduct():
         if uploaded_image:
             image_path = os.path.join(upload_folder, image_filename)
             uploaded_image.save(image_path)
+
+            thumbnail = generate_thumbnail(image_path)
+            thumbnail.save(os.path.join(thumbnail_folder, f'thumbnail_{image_filename}'))
+
+            add_product(section, name, brand, weight, price, description, image_filename, f'thumbnail_{image_filename}')
         else:
-            image_path = os.path.join(upload_folder, placeholder)
-
-        thumbnail = generate_thumbnail(image_path)
-        thumbnail.save(os.path.join(thumbnail_folder, f'thumbnail_{image_filename}'))
-
-        product_id += 1
-
-        product_data = {
-            "id": product_id,
-            "section": section,
-            "name":name,
-            "brand": brand,
-            "weight": weight,
-            "price": price,
-            "description": description,
-            "image_filename": image_filename,
-            "thumbnail_filename": f'thumbnail_{image_filename}',
-            "status": "Available"
-        }
-        products.append(product_data)
+            add_product(section, name, brand, weight, price, description, placeholder, placeholder)
 
     return render_template("addproduct.html", buy_pages=buy_pages)
 
@@ -208,6 +186,8 @@ def viewstock():
     if not authenticated:
         return redirect("/portal")
     
+    products = get_all_products()
+    
     if request.method == "POST":
         product_id = int(request.form.get('product_id'))
         action = request.form.get('action')
@@ -215,10 +195,11 @@ def viewstock():
         for product in products:
             if product['id'] == product_id:
                 if action == 'reserved':
-                    product['status'] = 'Reserved'
+                    update_product_status(product_id, 'Reserved')
                 elif action == 'available':
-                    product['status'] = 'Available'
+                    update_product_status(product_id, 'Available')
                 elif action == 'sold':
+                    delete_product(product_id)
                     products.remove(product)
                 break
 
@@ -300,6 +281,11 @@ def editraffle():
                     raffle.remove(raffle_item)
                 break
     return render_template('editraffle.html', raffles=raffle)
+
+
+@app.teardown_appcontext
+def teardown_db(exception):
+    close_db()
 
 if __name__ == '__main__':
     app.run(debug=False)
