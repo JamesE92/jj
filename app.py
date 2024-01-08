@@ -233,6 +233,8 @@ def editraffle():
     if not authenticated:
         return redirect('/portal')
     
+    raffle = get_all_raffles()
+
     if request.method == "POST":
         raffle_id = int(request.form.get('raffle_id'))
         action = request.form.get('action')
@@ -240,14 +242,15 @@ def editraffle():
         for raffle_item in raffle:
             if raffle_item['id'] == raffle_id:
                 if action == 'Limited Slots':
-                    raffle_item['status'] = 'Limited Slots'
+                    update_raffle_status(raffle_id, 'Limited Slots')
                 elif action == 'Full':
-                    raffle_item['status'] = 'Full'
+                    update_raffle_status(raffle_id, 'Full')
                 elif action == 'Slots Available':
-                    raffle_item['status'] = 'Slots Available'
+                    update_raffle_status(raffle_id, 'Slots Available')
                 elif action == 'Finish':
-                    raffle.remove(raffle_item)
+                    end_raffle(raffle_id)
                 break
+
     return render_template('editraffle.html', raffles=raffle)
 
 
