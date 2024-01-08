@@ -2,7 +2,7 @@ import json
 import os
 import secrets
 
-from config import Config, get_db, close_db, fetch_buy_pages, generate_thumbnail, add_product, get_all_products, get_products_by_section, get_product_by_id, update_product_status, delete_product, close_connection
+from config import Config, get_db, close_db, fetch_buy_pages, generate_thumbnail, add_product, get_all_products, get_products_by_section, get_product_by_id, update_product_status, delete_product, add_raffle, get_all_raffles, get_raffle_by_id, update_raffle_status, end_raffle, close_connection
 from flask import Flask, flash, render_template, redirect, request, session, url_for
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
@@ -37,9 +37,6 @@ def create_directories():
 
 create_directories()
 
-products = []
-product_id = 0
-
 raffle = []
 raffle_id = 0
 
@@ -49,15 +46,13 @@ def homepage():
 
 @app.route("/raffles", methods=["GET", "POST"])
 def display_raffles():
-    raffle_items = raffle
-    return render_template("raffles.html", raffles=raffle_items)
+    raffles = get_all_raffles()
+    return render_template("raffles.html", raffles = raffles)
 
 @app.route('/display_raffles/<int:raffle_id>', methods=["GET", "POST"])
 def rafflepage(raffle_id):
-    page = next((item for item in raffle if item['id'] == raffle_id), None)
-
-    return render_template('display_raffles.html', page=page, raffle=raffle)
-
+    page = get_raffle_by_id(raffle_id)
+    return render_template('display_raffles.html', page=page)
 
 @app.route("/chains", methods=["GET", "POST"])
 def chains():
@@ -214,48 +209,21 @@ def startraffle():
 
     global raffle_id
     if request.method == "POST":
-        item = request.form.get("item")
-        brand = request.form.get("brand")
-        weight = request.form.get("weight")
-        ticket = request.form.get("ticket")
-        description = request.form.get("description")
-        question = request.form.get("trivia")
-        a1 = request.form.get("answer1")
-        a2 = request.form.get("answer2")
-        a3 = request.form.get("answer3")
-
-        placeholder = "static/logo.png"
-        picture = request.files.get("image")
-        pic_name = secure_filename(picture.filename) if picture else placeholder
-
-        if picture:
-            pic_path = os.path.join(upload_folder, pic_name)
-            picture.save(pic_path)
-        else:
-            pic_path = os.path.join(upload_folder, placeholder)
-
-        thumbnail = generate_thumbnail(pic_path)
-        thumbnail_filename = f'thumbnail_{pic_name}'
-        thumbnail.save(os.path.join(thumbnail_folder, thumbnail_filename))
-
-        raffle_id += 1
-
         raffle_data = {
-            "id": raffle_id,
-            "item": item,
-            "brand": brand,
-            "weight": weight,
-            "ticket": ticket,
-            "description": description,
-            "pic_name": pic_name,
-            "thumbnail_filename": thumbnail_filename,
-            "question": question,
-            "answer1": a1,
-            "answer2": a2,
-            "answer3": a3,
+            "item": request.form.get("item"),
+            "brand": request.form.get("brand"),
+            "weight": request.form.get("weight"),
+            "ticket": request.form.get("ticket"),
+            "description": request.form.get("description"),
+            "question": request.form.get("trivia"),
+            "answer1": request.form.get("answer1"),
+            "answer2": request.form.get("answer2"),
+            "answer3": request.form.get("answer3"),
+            "pic_name": secure_filename(request.files.get("image").filename) if request.files.get("image") else "static/logo.png",
+            "thumbnail_filename": f'thumbnail_{secure_filename(request.files.get("image").filename)}' if request.files.get("image") else "thumbnail_static/logo.png",
             "status": "Slots Available"
         }
-        raffle.append(raffle_data)
+        add_raffle(**raffle_data) 
 
     return render_template('startraffle.html')
 

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    {{ raffle.item }}
+    {{ page.item }}
 {% endblock %}
 
 {% block main %}
@@ -35,7 +35,7 @@
         </select>
 
         <h3>Enter Raffle</h3>
-        <form action="{{ url_for('display_raffles', raffle_id=raffle.id) }}" method="POST">
+        <form action="{{ url_for('display_raffles', raffle_id=page.id) }}" method="POST">
             <input type="hidden" id="selectedAnswer" name="selectedAnswer" value="">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
