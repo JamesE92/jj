@@ -2,7 +2,10 @@ import json
 import os
 import secrets
 
-from config import Config, get_db, close_db, fetch_buy_pages, generate_thumbnail, add_product, get_all_products, get_products_by_section, get_product_by_id, update_product_status, delete_product, add_raffle, get_all_raffles, get_raffle_by_id, update_raffle_status, end_raffle, close_connection
+from config import (Config, get_db, close_db, fetch_buy_pages, generate_thumbnail,
+add_product, get_all_products, get_products_by_section, get_product_by_id, update_product_status,
+delete_product, add_raffle, get_all_raffles, get_raffle_by_id, update_raffle_status, end_raffle, 
+get_username, get_password, verify_login, close_connection)
 from flask import Flask, flash, render_template, redirect, request, session, url_for
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
@@ -37,8 +40,12 @@ def create_directories():
 
 create_directories()
 
-raffle = []
-raffle_id = 0
+def is_staff():
+    if 'username' in session:
+        username = session['username']
+        user = get_username(username)
+        return user['staff']
+    return False
 
 @app.route('/', methods=["GET", "POST"])
 def homepage():
@@ -116,143 +123,136 @@ def contact():
 
 @app.route('/portal', methods=["GET", "POST"])
 def portal():
-    global authenticated
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        stored_hashed_password = hashed_password
-
-        if username == Config.USERNAME and check_password_hash(stored_hashed_password, password):
-            
-            authenticated = True
-            flash('Login Successful', 'success')
+        if verify_login(username, password):
+            session['username'] = username
+            flash('Login Successful!', 'success')
             return redirect(url_for('dashboard'))
         else:
-            flash('Invalid username or password', 'error')
+            flash('Invalid username or password.', 'error')
+            return redirect(url_for('portal'))
 
     return render_template("portal.html")
 
 @app.route('/dashboard', methods=["GET", "POST"])
 def dashboard():
-    global authenticated
-    if not authenticated:
-        return redirect("/portal")
-    
-    return render_template("dashboard.html")
+    if is_staff():
+        return render_template("dashboard.html")
+    else:
+        return redirect(url_for('portal'))
 
 @app.route("/addproduct", methods=["GET", "POST"])
-def addproduct():
-    global product_id
-    global authenticated
-    if not authenticated:
-        return redirect("/portal")    
+def addproduct():   
+    if is_staff():
+        buy_pages = fetch_buy_pages()
+
+        if request.method == "POST":
+            section = request.form.get("section")
+            name = request.form.get("item")
+            brand = request.form.get("brand")
+            weight = float(request.form.get("weight"))
+            price = float(request.form.get("price"))
+            description = request.form.get("description")
+
+            placeholder = '/static/logo.png'
+            uploaded_image = request.files.get('image')
+            image_filename = secure_filename(uploaded_image.filename) if uploaded_image else placeholder
+
+            if uploaded_image:
+                image_path = os.path.join(upload_folder, image_filename)
+                uploaded_image.save(image_path)
+
+                thumbnail = generate_thumbnail(image_path)
+                thumbnail.save(os.path.join(thumbnail_folder, f'thumbnail_{image_filename}'))
+
+                add_product(section, name, brand, weight, price, description, image_filename, f'thumbnail_{image_filename}')
+            else:
+                add_product(section, name, brand, weight, price, description, placeholder, placeholder)
+
+        return render_template("addproduct.html", buy_pages=buy_pages)
+    else:
+        return redirect(url_for('portal'))
     
-    buy_pages = fetch_buy_pages()
-
-    if request.method == "POST":
-        section = request.form.get("section")
-        name = request.form.get("item")
-        brand = request.form.get("brand")
-        weight = float(request.form.get("weight"))
-        price = float(request.form.get("price"))
-        description = request.form.get("description")
-
-        placeholder = '/static/logo.png'
-        uploaded_image = request.files.get('image')
-        image_filename = secure_filename(uploaded_image.filename) if uploaded_image else placeholder
-
-        if uploaded_image:
-            image_path = os.path.join(upload_folder, image_filename)
-            uploaded_image.save(image_path)
-
-            thumbnail = generate_thumbnail(image_path)
-            thumbnail.save(os.path.join(thumbnail_folder, f'thumbnail_{image_filename}'))
-
-            add_product(section, name, brand, weight, price, description, image_filename, f'thumbnail_{image_filename}')
-        else:
-            add_product(section, name, brand, weight, price, description, placeholder, placeholder)
-
-    return render_template("addproduct.html", buy_pages=buy_pages)
-
 @app.route('/viewstock', methods=["GET", "POST"])
 def viewstock():
-    global authenticated
-    if not authenticated:
-        return redirect("/portal")
+    if is_staff():
     
-    products = get_all_products()
+        products = get_all_products()
     
-    if request.method == "POST":
-        product_id = int(request.form.get('product_id'))
-        action = request.form.get('action')
+        if request.method == "POST":
+            product_id = int(request.form.get('product_id'))
+            action = request.form.get('action')
 
-        for product in products:
-            if product['id'] == product_id:
-                if action == 'reserved':
-                    update_product_status(product_id, 'Reserved')
-                elif action == 'available':
-                    update_product_status(product_id, 'Available')
-                elif action == 'sold':
-                    delete_product(product_id)
-                    products.remove(product)
-                break
+            for product in products:
+                if product['id'] == product_id:
+                    if action == 'reserved':
+                        update_product_status(product_id, 'Reserved')
+                    elif action == 'available':
+                        update_product_status(product_id, 'Available')
+                    elif action == 'sold':
+                        delete_product(product_id)
+                        products.remove(product)
+                    break
 
-    return render_template('viewstock.html', products=products)
+        return render_template('viewstock.html', products=products)
+    else:
+        return redirect(url_for('portal'))
 
 @app.route('/startraffle', methods=["GET", "POST"])
 def startraffle():
 
-    global authenticated
-    if not authenticated:
-        return redirect("/portal")
+    if is_staff():
+        if request.method == "POST":
+            raffle_data = {
+                "item": request.form.get("item"),
+                "brand": request.form.get("brand"),
+                "weight": request.form.get("weight"),
+                "ticket": request.form.get("ticket"),
+                "description": request.form.get("description"),
+                "question": request.form.get("trivia"),
+                "answer1": request.form.get("answer1"),
+                "answer2": request.form.get("answer2"),
+                "answer3": request.form.get("answer3"),
+                "pic_name": secure_filename(request.files.get("image").filename) if request.files.get("image") else "static/logo.png",
+                "thumbnail_filename": f'thumbnail_{secure_filename(request.files.get("image").filename)}' if request.files.get("image") else "thumbnail_static/logo.png",
+                "status": "Slots Available"
+            }
+            add_raffle(**raffle_data) 
 
-    global raffle_id
-    if request.method == "POST":
-        raffle_data = {
-            "item": request.form.get("item"),
-            "brand": request.form.get("brand"),
-            "weight": request.form.get("weight"),
-            "ticket": request.form.get("ticket"),
-            "description": request.form.get("description"),
-            "question": request.form.get("trivia"),
-            "answer1": request.form.get("answer1"),
-            "answer2": request.form.get("answer2"),
-            "answer3": request.form.get("answer3"),
-            "pic_name": secure_filename(request.files.get("image").filename) if request.files.get("image") else "static/logo.png",
-            "thumbnail_filename": f'thumbnail_{secure_filename(request.files.get("image").filename)}' if request.files.get("image") else "thumbnail_static/logo.png",
-            "status": "Slots Available"
-        }
-        add_raffle(**raffle_data) 
-
-    return render_template('startraffle.html')
+        return render_template('startraffle.html')
+    
+    else:
+        return redirect('portal')
 
 @app.route('/editraffle', methods=["GET", "POST"])
 def editraffle():
-    global authenticated
-    if not authenticated:
-        return redirect('/portal')
+    if is_staff():
     
-    raffle = get_all_raffles()
+        raffle = get_all_raffles()
 
-    if request.method == "POST":
-        raffle_id = int(request.form.get('raffle_id'))
-        action = request.form.get('action')
+        if request.method == "POST":
+            raffle_id = int(request.form.get('raffle_id'))
+            action = request.form.get('action')
 
-        for raffle_item in raffle:
-            if raffle_item['id'] == raffle_id:
-                if action == 'Limited Slots':
-                    update_raffle_status(raffle_id, 'Limited Slots')
-                elif action == 'Full':
-                    update_raffle_status(raffle_id, 'Full')
-                elif action == 'Slots Available':
-                    update_raffle_status(raffle_id, 'Slots Available')
-                elif action == 'Finish':
-                    end_raffle(raffle_id)
-                break
+            for raffle_item in raffle:
+                if raffle_item['id'] == raffle_id:
+                    if action == 'Limited Slots':
+                        update_raffle_status(raffle_id, 'Limited Slots')
+                    elif action == 'Full':
+                        update_raffle_status(raffle_id, 'Full')
+                    elif action == 'Slots Available':
+                        update_raffle_status(raffle_id, 'Slots Available')
+                    elif action == 'Finish':
+                        end_raffle(raffle_id)
+                    break
 
-    return render_template('editraffle.html', raffles=raffle)
-
+        return render_template('editraffle.html', raffles=raffle)
+    
+    else:
+        return redirect(url_for('portal'))
 
 @app.teardown_appcontext
 def teardown_db(exception):
