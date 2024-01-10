@@ -2,7 +2,7 @@ import json
 import os
 import secrets
 
-from config import (Config, get_db, close_db, fetch_buy_pages, generate_thumbnail,
+from config import (get_db, close_db, fetch_buy_pages, generate_thumbnail,
 add_product, get_all_products, get_products_by_section, get_product_by_id, update_product_status,
 delete_product, add_raffle, get_all_raffles, get_raffle_by_id, update_raffle_status, end_raffle, 
 get_username, get_password, verify_login, close_connection)
@@ -19,10 +19,6 @@ with open('config.json', 'r') as config_file:
     config = json.load(config_file)
 
 app.config.update(config)
-
-app.config.from_object(Config)
-
-hashed_password = generate_password_hash(Config.PASSWORD)
 
 authenticated = False
 
