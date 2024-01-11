@@ -24,8 +24,8 @@ authenticated = False
 
 app.secret_key = secrets.token_hex(16)
 
-upload_folder = app.config['UPLOAD_FOLDER']
-thumbnail_folder = app.config['THUMBNAIL_FOLDER']
+upload_folder = os.path.join(os.getcwd(), config['UPLOAD_FOLDER'])
+thumbnail_folder = os.path.join(os.getcwd(), config['THUMBNAIL_FOLDER'])
     
 def create_directories():
     if not os.path.exists(upload_folder):
@@ -164,7 +164,9 @@ def addproduct():
                 thumbnail = generate_thumbnail(image_path)
                 thumbnail.save(os.path.join(thumbnail_folder, f'thumbnail_{image_filename}'))
 
-                add_product(section, name, brand, weight, price, description, image_filename, f'thumbnail_{image_filename}')
+                add_product(section, name, brand, weight, price, description, image_filename,
+                            f'thumbnail_{image_filename}')
+                
             else:
                 add_product(section, name, brand, weight, price, description, placeholder, placeholder)
 
@@ -255,4 +257,4 @@ def teardown_db(exception):
     close_db()
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
