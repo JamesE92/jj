@@ -13,7 +13,7 @@
             <a href="{{ url_for('rafflepage', raffle_id=raffle.id) }}">
                 <h3>{{ raffle.item }}</h3>
                 <img src="{{ url_for('static', filename='thumbnails/' + raffle.thumbnail_filename) }}" alt="Raffle thumbnail">
-                <p>{{ raffle.status }} - {{ raffle.ticket }}</p>
+                <p>{{ raffle.status }} - £{{ "{:.2f}".format(raffle.ticket) }}</p>
             </a>
         </div>
     {% endfor %}

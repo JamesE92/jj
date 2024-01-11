@@ -17,10 +17,10 @@
         {% endif %}
 
         {% if product.weight %}
-        <h3>Weight: {{ product.weight }}g</h3>
+        <h3>Weight: {{ "{:.2f}g".format(product.weight) }}</h3>
         {% endif %}
 
-        <h3>£{{ product.price }}</h3>
+        <h3>£{{ "{:.2f}".format(product.price) }}</h3>
 
         {% if product.description %}
         <p>{{ product.description }}</p>

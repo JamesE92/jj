@@ -16,10 +16,10 @@
         {% endif %}
 
         {% if page.weight %}
-        <h3>Weight: {{ page.weight }}</h3>
+        <h3>Weight: {{ "{:.2f}g".format(page.weight) }}</h3>
         {% endif %}
 
-        <h3>£{{ page.ticket }}</h3>
+        <h3>£{{ "{:.2f}".format(page.ticket) }}</h3>
 
         {% if page.description %}
         <h3>{{ page.description }}</h3>
