@@ -8,12 +8,12 @@
 <img src="/static/logo2.png">
 <h1>Jokers Watches</h1>
 <div class="product-grid">
-    {% for product in watch_products %}
+    {% for i in range (watch_products|length) %}
     <div class="product">
-        <a href="{{ url_for('product', product_id=product.id) }}">
-            <h3>{{ product.name }}</h3>
-            <img src="{{ url_for('static', filename='thumbnails/' + product.thumbnail_filename) }}" alt="Product Thumbnail">
-            <p>{{ product.status }} - £{{ "{:.2f}".format(product.price) }}</p>
+        <a href="{{ url_for('product', product_id=watch_products[i].id) }}">
+            <h3>{{ watch_products[i].name }}</h3>
+            <img src="{{ url_for('static', filename='thumbnails/' + watch_products[i].thumbnail_filename) }}" alt="Product Thumbnail">
+            <p>{{ watch_products[i].status }} - £{{ "{:.2f}".format(sale_prices[i]) }}</p>
         </a>
     </div>
     {% endfor %}

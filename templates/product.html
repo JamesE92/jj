@@ -20,7 +20,7 @@
         <h3>Weight: {{ "{:.2f}g".format(product.weight) }}</h3>
         {% endif %}
 
-        <h3>£{{ "{:.2f}".format(product.price) }}</h3>
+        <h3>£{{ "{:.2f}".format(sale_prices) }}</h3>
 
         {% if product.description %}
         <p>{{ product.description }}</p>

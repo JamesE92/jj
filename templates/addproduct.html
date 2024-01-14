@@ -28,8 +28,15 @@
         <label for="brand">Brand</label>
             <input type="text" id="brand" name="brand">
 
-        <label for="weight">Weight</label>
-            <input type="number" id="weight" name="weight">
+        <label for="sell_by_weight">Sell by weight</label>
+            <select id="sell_by_weight" name="sell_by_weight" required>
+                <option value="no" selected>No</option>
+                <option value="9c">9 carat</option>
+                <option value="24c">24 carat</option>
+            </select>
+
+        <label for="weight">Weight*</label>
+            <input type="number" id="weight" name="weight" value="0" required>
             
         <label for="price">Price*</label>
             <input type="number" id="price" name="price" required>

@@ -2,10 +2,11 @@ import json
 import os
 import secrets
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from config import (get_db, close_db, fetch_buy_pages, generate_thumbnail,
 add_product, get_all_products, get_products_by_section, get_product_by_id, update_product_status,
 delete_product, add_raffle, get_all_raffles, get_raffle_by_id, update_raffle_status, end_raffle, 
-get_username, get_password, verify_login, close_connection)
+get_username, get_password, verify_login, update_gold_price, close_connection)
 from flask import Flask, flash, render_template, redirect, request, session, url_for
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
@@ -14,6 +15,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(update_gold_price, 'interval', hours=1)
+scheduler.start()
 
 with open('config.json', 'r') as config_file:
     config = json.load(config_file)
@@ -60,42 +65,52 @@ def rafflepage(raffle_id):
 @app.route("/chains", methods=["GET", "POST"])
 def chains():
     chain_products = get_products_by_section('Chain')
-    return render_template("chains.html", chain_products=chain_products)
+    sale_prices = [max(product['price'], product['current_gold_price']) for product in chain_products]
+
+    return render_template("chains.html", chain_products=chain_products, sale_prices=sale_prices)
 
 @app.route("/bracelets", methods=["GET", "POST"])
 def bracelets():
     bracelet_products = get_products_by_section('Bracelet')
-    return render_template("bracelets.html", bracelet_products=bracelet_products)
+    sale_prices = [max(product['price'], product['current_gold_price']) for product in bracelet_products]
+    
+    return render_template("bracelets.html", bracelet_products=bracelet_products, sale_prices=sale_prices)
 
 @app.route("/bars", methods=["GET", "POST"])
 def bars():
     bar_products = get_products_by_section('Gold')
-    return render_template("bars.html", bar_products=bar_products)
+    sale_prices = [max(product['price'], product['current_gold_price']) for product in bar_products]
+    return render_template("bars.html", bar_products=bar_products, sale_prices=sale_prices)
 
 @app.route("/creole", methods=["GET", "POST"])
 def creole():
     creole_products = get_products_by_section('Creole')
-    return render_template("creole.html", creole_products=creole_products)
+    sale_prices = [max(product['price'], product['current_gold_price']) for product in creole_products]
+    return render_template("creole.html", creole_products=creole_products, sale_prices=sale_prices)
 
 @app.route("/studs", methods=["GET", "POST"])
 def studs():
     stud_products = get_products_by_section('Studs')
-    return render_template("studs.html", stud_products=stud_products)
+    sale_prices = [max(product['price'], product['current_gold_price']) for product in stud_products]
+    return render_template("studs.html", stud_products=stud_products, sale_prices=sale_prices)
 
 @app.route("/watches", methods=["GET", "POST"])
 def watches():
     watch_products = get_products_by_section('Watch')
-    return render_template("watches.html", watch_products=watch_products)
+    sale_prices = [max(product['price'], product['current_gold_price']) for product in watch_products]
+    return render_template("watches.html", watch_products=watch_products, sale_prices=sale_prices)
 
 @app.route("/rings", methods=["GET", "POST"])
 def rings():
     ring_products = get_products_by_section('Ring')
-    return render_template("rings.html", ring_products=ring_products)
+    sale_prices = [max(product['price'], product['current_gold_price']) for product in ring_products]
+    return render_template("rings.html", ring_products=ring_products, sale_prices=sale_prices)
 
 @app.route("/product/<int:product_id>", methods=["GET", "POST"])
 def product(product_id):
     product = get_product_by_id(product_id)
-    return render_template("product.html", product=product)
+    sale_prices = max(product['price'], product['current_gold_price'])
+    return render_template("product.html", product=product, sale_prices=sale_prices)
 
 @app.route("/sellgold", methods=["GET", "POST"])
 def sellgold():
@@ -149,7 +164,8 @@ def addproduct():
             section = request.form.get("section")
             name = request.form.get("item")
             brand = request.form.get("brand")
-            weight = float(request.form.get("weight"))
+            sale_choice = request.form.get("sell_by_weight")
+            weight = request.form.get("weight")
             price = float(request.form.get("price"))
             description = request.form.get("description")
 
@@ -164,13 +180,19 @@ def addproduct():
                 thumbnail = generate_thumbnail(image_path)
                 thumbnail.save(os.path.join(thumbnail_folder, f'thumbnail_{image_filename}'))
 
-                add_product(section, name, brand, weight, price, description, image_filename,
+                add_product(section, name, brand, sale_choice, weight, price, description, image_filename,
                             f'thumbnail_{image_filename}')
                 
+                update_gold_price()
+                return redirect(url_for('addproduct'))
             else:
-                add_product(section, name, brand, weight, price, description, placeholder, placeholder)
+                add_product(section, name, brand, sale_choice, weight, price, description, placeholder, placeholder)
 
+                update_gold_price()
+                return redirect(url_for('addproduct'))
+            
         return render_template("addproduct.html", buy_pages=buy_pages)
+    
     else:
         return redirect(url_for('portal'))
     
