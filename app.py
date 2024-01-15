@@ -132,6 +132,74 @@ def about():
 def contact():
     return render_template("contact.html")
 
+@app.route("/cart", methods=["GET", "POST"])
+def cart():
+    cart_contents = session.get('cart', {})
+
+    cart_items = []
+    total_price = 0
+
+    for product_id, quantity in cart_contents.items():
+        product = get_product_by_id(product_id)
+
+        if product and product['status'] == 'Available':
+            item_total_price = quantity * max(product['price'], product['current_gold_price'])
+            total_price += item_total_price
+
+            cart_items.append({
+                'product': product,
+                'quantity': quantity,
+                'total_price': item_total_price
+            })
+
+    return render_template("cart.html", cart_items=cart_items, total_price=total_price)
+
+@app.route('/add_to_bag/<int:product_id>', methods=["POST"])
+def add_to_bag(product_id):
+    quantity = int(request.form.get('quantity'))
+
+    product = get_product_by_id(product_id)
+    if product and product['status'] == 'Available':
+        cart = session.get('cart', {})
+        cart[product_id] = cart.get(product_id, 0) + quantity
+        session['cart'] = cart
+        flash('Product added to bag!', 'success')
+    else:
+        flash('Product currently unavailable - if you really love it, use contact to enquire.')
+    return redirect(url_for('product', product_id=product_id))
+
+@app.route('/change_bag_amount/<int:product_id>', methods=["POST"])
+def change_bag_amount(product_id):
+    quantity = int(request.form.get('quantity'))
+
+    if quantity > 0:
+        cart = session.get('cart')
+        if product_id in cart:
+            cart[product_id] = quantity
+            session['cart'] = cart
+            flash('Change successful!', 'success')
+        else:
+            flash('Product not in bag.', 'error')
+    return redirect(url_for('cart'))
+
+@app.route('/remove_from_bag/<int:product_id>', methods=["POST"])
+def remove_from_bag(product_id):
+    cart = session.get('cart', {})
+
+    if product_id in cart:
+        del cart[product_id]
+        session['cart'] = cart
+        flash('Product removed from bag!', 'success')
+    else:
+        flash('Product not found in the bag.', 'error')
+
+    return redirect(url_for('cart'))
+
+@app.route('/checkout')
+def checkout():
+    pass
+
+
 @app.route('/portal', methods=["GET", "POST"])
 def portal():
     if request.method == 'POST':

@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Shopping Bag
+{% endblock %}
+
+{% block main %}
+
+    <h2>Your Shopping Bag</h2>
+
+    {% if cart_items %}
+    <ul>
+        {% for item in cart_items %}
+        <li>{{ item.product.name }} - Quantity: {{ item.quantity }} - Item Total Price: £{{ "{:.2f}".format(item.total_price) }}
+        <form action="{{ url_for('change_bag_amount', product_id=item.product.id) }}" method="POST">
+            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" required>
+            <button type="submit">Update</button>
+        </form>
+        <form action="{{ url_for('remove_from_bag', product_id=item.product.id) }}" method="POST">
+            <button type="submit">Remove from Bag</button>
+        </form>
+        </li>
+        {% endfor %}
+    </ul>
+    <p>Total Price: £{{ "{:.2f}".format(total_price) }}</p>
+    <form action="{{ url_for('checkout') }}" method="POST">
+        <button type="submit">Checkout</button>
+    </form>
+    {% else %}
+        <p>Your bag is empty.</p>
+    {% endif %}
+{% endblock %}
