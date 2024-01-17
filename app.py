@@ -155,9 +155,6 @@ def cart():
 
     return render_template("cart.html", cart_items=cart_items, total_price=total_price)
 
-
-
-
 @app.route('/add_to_bag/<int:product_id>', methods=["POST"])
 def add_to_bag(product_id):
     quantity = int(request.form.get('quantity'))
@@ -215,7 +212,6 @@ def remove_from_bag(product_id):
 @app.route('/checkout')
 def checkout():
     pass
-
 
 @app.route('/portal', methods=["GET", "POST"])
 def portal():
