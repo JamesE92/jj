@@ -7,7 +7,7 @@ from config import (get_db, close_db, fetch_buy_pages, generate_thumbnail,
 add_product, get_all_products, get_products_by_section, get_product_by_id, update_product_status,
 delete_product, add_raffle, get_all_raffles, get_raffle_by_id, update_raffle_status, end_raffle, 
 get_username, get_password, verify_login, update_gold_price, close_connection)
-from flask import Flask, flash, render_template, redirect, request, session, url_for
+from flask import Flask, flash, jsonify, render_template, redirect, request, session, url_for
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from PIL import Image
@@ -134,25 +134,29 @@ def contact():
 
 @app.route("/cart", methods=["GET", "POST"])
 def cart():
-    cart_contents = session.get('cart', {})
+
+    cart_ids = session.get('cart_ids', [])
 
     cart_items = []
     total_price = 0
 
-    for product_id, quantity in cart_contents.items():
+    for product_id in cart_ids:
         product = get_product_by_id(product_id)
 
         if product and product['status'] == 'Available':
-            item_total_price = quantity * max(product['price'], product['current_gold_price'])
+            item_total_price = max(product['price'], product['current_gold_price'])
             total_price += item_total_price
 
             cart_items.append({
                 'product': product,
-                'quantity': quantity,
+                'quantity': 1, 
                 'total_price': item_total_price
             })
 
     return render_template("cart.html", cart_items=cart_items, total_price=total_price)
+
+
+
 
 @app.route('/add_to_bag/<int:product_id>', methods=["POST"])
 def add_to_bag(product_id):
@@ -160,12 +164,17 @@ def add_to_bag(product_id):
 
     product = get_product_by_id(product_id)
     if product and product['status'] == 'Available':
-        cart = session.get('cart', {})
-        cart[product_id] = cart.get(product_id, 0) + quantity
-        session['cart'] = cart
+        
+        cart_ids = session.get('cart_ids', [])
+        
+        cart_ids.append(product_id)
+        
+        session['cart_ids'] = cart_ids
+        
         flash('Product added to bag!', 'success')
     else:
         flash('Product currently unavailable - if you really love it, use contact to enquire.')
+
     return redirect(url_for('product', product_id=product_id))
 
 @app.route('/change_bag_amount/<int:product_id>', methods=["POST"])
@@ -173,22 +182,30 @@ def change_bag_amount(product_id):
     quantity = int(request.form.get('quantity'))
 
     if quantity > 0:
-        cart = session.get('cart')
-        if product_id in cart:
-            cart[product_id] = quantity
-            session['cart'] = cart
-            flash('Change successful!', 'success')
-        else:
-            flash('Product not in bag.', 'error')
+
+        cart_ids = session.get('cart_ids', [])
+        
+        if product_id not in cart_ids:
+            cart_ids.append(product_id)
+        
+        session['cart_ids'] = cart_ids
+
+        flash('Change successful!', 'success')
+    else:
+        flash('Invalid quantity.', 'error')
+
     return redirect(url_for('cart'))
 
 @app.route('/remove_from_bag/<int:product_id>', methods=["POST"])
 def remove_from_bag(product_id):
-    cart = session.get('cart', {})
+    
+    cart_ids = session.get('cart_ids', [])
 
-    if product_id in cart:
-        del cart[product_id]
-        session['cart'] = cart
+    if product_id in cart_ids:
+        cart_ids.remove(product_id)
+
+        session['cart_ids'] = cart_ids
+
         flash('Product removed from bag!', 'success')
     else:
         flash('Product not found in the bag.', 'error')
