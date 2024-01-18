@@ -134,9 +134,7 @@ def contact():
 
 @app.route("/cart", methods=["GET", "POST"])
 def cart():
-
     cart_ids = session.get('cart_ids', [])
-
     cart_items = []
     total_price = 0
 
@@ -149,7 +147,6 @@ def cart():
 
             cart_items.append({
                 'product': product,
-                'quantity': 1, 
                 'total_price': item_total_price
             })
 
@@ -157,45 +154,26 @@ def cart():
 
 @app.route('/add_to_bag/<int:product_id>', methods=["POST"])
 def add_to_bag(product_id):
-    quantity = int(request.form.get('quantity'))
-
     product = get_product_by_id(product_id)
+    
     if product and product['status'] == 'Available':
-        
         cart_ids = session.get('cart_ids', [])
-        
-        cart_ids.append(product_id)
-        
-        session['cart_ids'] = cart_ids
-        
-        flash('Product added to bag!', 'success')
+
+        if product_id not in cart_ids:
+            cart_ids.append(product_id)
+
+            session['cart_ids'] = cart_ids
+
+            flash('Product added to bag!', 'success')
+        else:
+            flash('Product is already in the bag.', 'info')
     else:
-        flash('Product currently unavailable - if you really love it, use contact to enquire.')
+        flash('Product currently unavailable - if you really love it, use contact to inquire.', 'error')
 
     return redirect(url_for('product', product_id=product_id))
 
-@app.route('/change_bag_amount/<int:product_id>', methods=["POST"])
-def change_bag_amount(product_id):
-    quantity = int(request.form.get('quantity'))
-
-    if quantity > 0:
-
-        cart_ids = session.get('cart_ids', [])
-        
-        if product_id not in cart_ids:
-            cart_ids.append(product_id)
-        
-        session['cart_ids'] = cart_ids
-
-        flash('Change successful!', 'success')
-    else:
-        flash('Invalid quantity.', 'error')
-
-    return redirect(url_for('cart'))
-
 @app.route('/remove_from_bag/<int:product_id>', methods=["POST"])
 def remove_from_bag(product_id):
-    
     cart_ids = session.get('cart_ids', [])
 
     if product_id in cart_ids:
@@ -208,6 +186,7 @@ def remove_from_bag(product_id):
         flash('Product not found in the bag.', 'error')
 
     return redirect(url_for('cart'))
+
 
 @app.route('/checkout')
 def checkout():

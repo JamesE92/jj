@@ -11,10 +11,8 @@
     {% if cart_items %}
     <ul>
         {% for item in cart_items %}
-        <li>{{ item.product.name }} - Quantity: {{ item.quantity }} - Item Total Price: £{{ "{:.2f}".format(item.total_price) }}
-        <form action="{{ url_for('change_bag_amount', product_id=item.product.id) }}" method="POST">
-            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" required>
-            <button type="submit">Update</button>
+        <li><img src="{{ url_for('static', filename='thumbnails/' + item.product.thumbnail_filename) }}" alt="Product Thumbnail">
+            <br> {{ item.product.name }} - Item Total Price: £{{ "{:.2f}".format(item.total_price) }}
         </form>
         <form action="{{ url_for('remove_from_bag', product_id=item.product.id) }}" method="POST">
             <button type="submit">Remove from Bag</button>
