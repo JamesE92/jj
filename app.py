@@ -290,16 +290,18 @@ def startraffle():
                 "item": request.form.get("item"),
                 "brand": request.form.get("brand"),
                 "weight": request.form.get("weight"),
+                "slots": request.form.get("slots"),
                 "ticket": request.form.get("ticket"),
                 "description": request.form.get("description"),
+                "pic_name": secure_filename(request.files.get("image").filename) if request.files.get("image") else "static/logo.png",
+                "thumbnail_filename": f'thumbnail_{secure_filename(request.files.get("image").filename)}' if request.files.get("image") else "thumbnail_static/logo.png",
+                "status": "Slots Available",
                 "question": request.form.get("trivia"),
                 "answer1": request.form.get("answer1"),
                 "answer2": request.form.get("answer2"),
                 "answer3": request.form.get("answer3"),
-                "pic_name": secure_filename(request.files.get("image").filename) if request.files.get("image") else "static/logo.png",
-                "thumbnail_filename": f'thumbnail_{secure_filename(request.files.get("image").filename)}' if request.files.get("image") else "thumbnail_static/logo.png",
-                "status": "Slots Available"
-            }
+                "correct": request.form.get("correct")
+            } 
             add_raffle(**raffle_data) 
 
         return render_template('startraffle.html')

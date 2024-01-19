@@ -35,7 +35,7 @@
         </select>
 
         <h3>Enter Raffle</h3>
-        <form action="{{ url_for('display_raffles', raffle_id=page.id) }}" method="POST">
+        <form id="raffleForm" action="{{ url_for('display_raffles', raffle_id=page.id) }}" method="POST">
             <input type="hidden" id="selectedAnswer" name="selectedAnswer" value="">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
@@ -59,6 +59,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             rafflesubject();
+            validateTrivia("{{ page.correct }}", "{{ page.answer1 }}", "{{ page.answer2 }}", "{{ page.answer3 }}");
         });
     </script>
     {% endblock %}
