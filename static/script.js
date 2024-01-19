@@ -1,20 +1,9 @@
-function rafflesubject() {
-    var selectedAnswer = document.getElementById("answers");
-    var subjectField = document.getElementById("selectedAnswer");
+function validateTrivia(event) {
+    var selectedAnswer = document.getElementById('answers').value;
+    var correctAnswer = document.getElementById('correct').value;
 
-    selectedAnswer.addEventListener('change', function() {
-        subjectField.value = selectedAnswer.value;
-    });
-}
-
-function validateTrivia(correctAnswer, answer1, answer2, answer3) {
-    var form = document.getElementById('raffleForm');
-    form.addEventListener('submit', function(event) {
-        var selectedAnswer = document.getElementById('answers').value;
-
-        if (selectedAnswer !== correctAnswer) {
-            alert('Wrong answer!');
-            event.preventDefault();
-        }
-    });
+    if (selectedAnswer !== correctAnswer) {
+        alert('Are you sure?');
+        event.preventDefault();
+    }
 }

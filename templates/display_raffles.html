@@ -28,13 +28,15 @@
         {% if page.status != 'Full' %}
         <h3>{{ page.trivia }}</h3>
 
-        <select name="answers" id="answers">
-            <option value="answer1">{{ page.answer1 }}</option>
-            <option value="answer2">{{ page.answer2 }}</option>
-            <option value="answer3">{{ page.answer3 }}</option>
-        </select>
-
-        <form action="{{ url_for('add_to_bag', item_id=page.id) }}" method="POST">
+        <form id="raffleForm" action="{{ url_for('add_to_bag', item_id=page.id) }}" method="POST">
+            <select name="answers" id="answers">
+                <option value="answer1">{{ page.answer1 }}</option>
+                <option value="answer2">{{ page.answer2 }}</option>
+                <option value="answer3">{{ page.answer3 }}</option>
+            </select>
+            
+            <input type="hidden" id="correct" name="correct" value="{{ page.correct }}">
+        
             <button type="submit">Add to Bag</button>
         </form>
         
@@ -48,8 +50,10 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            rafflesubject();
-            validateTrivia("{{ page.correct }}", "{{ page.answer1 }}", "{{ page.answer2 }}", "{{ page.answer3 }}");
-        });
+    var form = document.getElementById('raffleForm');
+    form.addEventListener('submit', function(event) {
+        validateTrivia(event);
+    });
+});
     </script>
     {% endblock %}
