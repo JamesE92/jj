@@ -135,58 +135,99 @@ def contact():
 @app.route("/cart", methods=["GET", "POST"])
 def cart():
     cart_ids = session.get('cart_ids', [])
-    cart_items = []
+    cart_raffle_ids = session.get('cart_raffle_ids', [])
+    
+    cart_products = []
+    cart_raffles = []
     total_price = 0
 
     for product_id in cart_ids:
         product = get_product_by_id(product_id)
-
+        
         if product and product['status'] == 'Available':
             item_total_price = max(product['price'], product['current_gold_price'])
             total_price += item_total_price
 
-            cart_items.append({
-                'product': product,
+            cart_products.append({
+                'item': product,
                 'total_price': item_total_price
             })
 
-    return render_template("cart.html", cart_items=cart_items, total_price=total_price)
+    for raffle_id in cart_raffle_ids:
+        raffle = get_raffle_by_id(raffle_id)
 
-@app.route('/add_to_bag/<int:product_id>', methods=["POST"])
-def add_to_bag(product_id):
-    product = get_product_by_id(product_id)
-    
-    if product and product['status'] == 'Available':
+        if raffle and raffle['status'] == 'Slots Available':
+            item_total_price = raffle['ticket']
+            total_price += item_total_price
+
+            cart_raffles.append({
+                'item': raffle,
+                'total_price': item_total_price
+            })
+
+    return render_template("cart.html", cart_products=cart_products, cart_raffles=cart_raffles, total_price=total_price)
+
+@app.route('/add_to_bag/<int:item_id>', methods=["POST"])
+def add_to_bag(item_id):
+    product = get_product_by_id(item_id)
+    raffle = get_raffle_by_id(item_id)
+
+    if product is not None and product['status'] == 'Available':
         cart_ids = session.get('cart_ids', [])
 
-        if product_id not in cart_ids:
-            cart_ids.append(product_id)
-
+        if item_id not in cart_ids:
+            cart_ids.append(item_id)
             session['cart_ids'] = cart_ids
-
             flash('Product added to bag!', 'success')
         else:
             flash('Product is already in the bag.', 'info')
+        return redirect(url_for('product', product_id=item_id))
+
+    elif raffle is not None and raffle['status'] == 'Slots Available':
+        cart_raffle_ids = session.get('cart_raffle_ids', [])
+
+        if item_id not in cart_raffle_ids:
+            cart_raffle_ids.append(item_id)
+            session['cart_raffle_ids'] = cart_raffle_ids
+            flash('Raffle ticket added to bag!', 'success')
+        else:
+            flash('Raffle ticket is already in the bag.', 'info')
+        return redirect(url_for('display_raffles', raffle_id=item_id))
+
     else:
-        flash('Product currently unavailable - if you really love it, use contact to inquire.', 'error')
+        flash('Item is currently unavailable - if you really love it, use contact to inquire.', 'error')
+        return render_template("404.html"), 404
 
-    return redirect(url_for('product', product_id=product_id))
 
-@app.route('/remove_from_bag/<int:product_id>', methods=["POST"])
-def remove_from_bag(product_id):
-    cart_ids = session.get('cart_ids', [])
+@app.route('/remove_from_bag/<int:item_id>', methods=["POST"])
+def remove_from_bag(item_id):
+    product = get_product_by_id(item_id)
+    raffle = get_raffle_by_id(item_id)
 
-    if product_id in cart_ids:
-        cart_ids.remove(product_id)
+    if product is not None:
+        cart_ids = session.get('cart_ids', [])
 
-        session['cart_ids'] = cart_ids
+        if item_id in cart_ids:
+            cart_ids.remove(item_id)
+            session['cart_ids'] = cart_ids
+            flash('Product removed from bag!', 'success')
+        else:
+            flash('Product not found in the bag.', 'info')
+        return redirect(url_for('cart'))
 
-        flash('Product removed from bag!', 'success')
+    elif raffle is not None:
+        cart_raffle_ids = session.get('cart_raffle_ids', [])
+
+        if item_id in cart_raffle_ids:
+            cart_raffle_ids.remove(item_id)
+            session['cart_raffle_ids'] = cart_raffle_ids
+            flash('Raffle ticket removed from bag!', 'success')
+        else:
+            flash('Raffle ticket not found in the bag.', 'info')
+        return redirect(url_for('cart'))
+
     else:
-        flash('Product not found in the bag.', 'error')
-
-    return redirect(url_for('cart'))
-
+        flash('Item not found in the bag.', 'error')
 
 @app.route('/checkout')
 def checkout():

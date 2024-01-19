@@ -27,7 +27,7 @@
         {% endif %}
 
         {% if product.status == 'Available' %}
-        <form action="{{ url_for('add_to_bag', product_id=product.id)}}" method="POST">
+        <form action="{{ url_for('add_to_bag', item_id=product.id)}}" method="POST">
             <button type="submit">Add to Bag</button>
         </form>
         {% endif %}       

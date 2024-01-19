@@ -8,13 +8,22 @@
 
     <h2>Your Shopping Bag</h2>
 
-    {% if cart_items %}
+    {% if cart_products or cart_raffles %}
     <ul>
-        {% for item in cart_items %}
-        <li><img src="{{ url_for('static', filename='thumbnails/' + item.product.thumbnail_filename) }}" alt="Product Thumbnail">
-            <br> {{ item.product.name }} - Item Total Price: £{{ "{:.2f}".format(item.total_price) }}
+        {% for product in cart_products %}
+        <li><img src="{{ url_for('static', filename='thumbnails/' + product.item.thumbnail_filename) }}" alt="Product Thumbnail">
+            <br> {{ product.item.name }} - Item Total Price: £{{ "{:.2f}".format(product.total_price) }}
         </form>
-        <form action="{{ url_for('remove_from_bag', product_id=item.product.id) }}" method="POST">
+        <form action="{{ url_for('remove_from_bag', item_id=product.item.id) }}" method="POST">
+            <button type="submit">Remove from Bag</button>
+        </form>
+        </li>
+        {% endfor %}
+
+        {% for raffle in cart_raffles %}
+        <li>Raffle: {{ raffle.item.name }} - Item Total Price: £{{ "{:.2f}".format(raffle.total_price) }}
+        </form>
+        <form action="{{ url_for('remove_from_bag', item_id=raffle.item.id) }}" method="POST">
             <button type="submit">Remove from Bag</button>
         </form>
         </li>
